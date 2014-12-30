@@ -1,16 +1,16 @@
 #include "MsgReceiver.h"
 
 MsgReceiver::MsgReceiver() {
-    error = SR_ERR_NONE;
+    error = RCV_ERR_NONE;
     resetState();
-    startChar = SR_DFLT_START_CHAR;
-    stopChar = SR_DFLT_STOP_CHAR;
-    sepChar = SR_DFLT_SEP_CHAR;
+    startChar = RCV_DFLT_START_CHAR;
+    stopChar = RCV_DFLT_STOP_CHAR;
+    sepChar = RCV_DFLT_SEP_CHAR;
     resetState();
 }
 
 bool MsgReceiver::messageReady() {
-    if (state == SR_STATE_MESSAGE) {
+    if (state == RCV_STATE_MESSAGE) {
         return true;
     }
     else {
@@ -19,7 +19,7 @@ bool MsgReceiver::messageReady() {
 }
 
 uint8_t MsgReceiver::numberOfItems() {
-    if (state == SR_STATE_MESSAGE) {
+    if (state == RCV_STATE_MESSAGE) {
         return itemCnt;
     }
     else {
@@ -86,7 +86,7 @@ void MsgReceiver::copyString(uint8_t itemNum, char* string, uint8_t size) {
 }
 
 bool MsgReceiver::checkItemRange(uint8_t itemNum) {
-    if ((state==SR_STATE_MESSAGE) && (itemNum >=0) && (itemNum < itemCnt)) {
+    if ((state==RCV_STATE_MESSAGE) && (itemNum >=0) && (itemNum < itemCnt)) {
         return true;
     }
     else {
@@ -95,15 +95,15 @@ bool MsgReceiver::checkItemRange(uint8_t itemNum) {
 }
 
 void MsgReceiver::process(int serialByte) {
-    if (serialByte > 0){
+    if (serialByte >= 0){
         switch (state) {
-            case SR_STATE_IDLE:
+            case RCV_STATE_IDLE:
                 processNewMsg(serialByte);
                 break;
-            case SR_STATE_RECEIVING:
+            case RCV_STATE_RECEIVING:
                 processCurMsg(serialByte);
                 break;
-            case SR_STATE_MESSAGE:
+            case RCV_STATE_MESSAGE:
                 break;
             default:
                 break;
@@ -115,14 +115,14 @@ void MsgReceiver::process(int serialByte) {
 void MsgReceiver::processNewMsg(int serialByte) {
     if (serialByte == startChar) {
         resetItems();
-        state = SR_STATE_RECEIVING;
-        error = SR_ERR_NONE;
+        state = RCV_STATE_RECEIVING;
+        error = RCV_ERR_NONE;
     }
     else if ((serialByte == '\n') || (serialByte == ' ')) {
         return;
     }
     else {
-        error = SR_ERR_ILLEGAL_CHAR;
+        error = RCV_ERR_ILLEGAL_CHAR;
         resetState();
     }
 }
@@ -146,7 +146,7 @@ void MsgReceiver::processCurMsg(int serialByte) {
 
 void MsgReceiver::handleStartChar(int serialByte) {
     resetState();
-    error = SR_ERR_ILLEGAL_CHAR;
+    error = RCV_ERR_ILLEGAL_CHAR;
 }
 
 void MsgReceiver::handleStopChar(int serialByte) {
@@ -156,14 +156,14 @@ void MsgReceiver::handleStopChar(int serialByte) {
         itemCnt++;
     }
     // Check message checksum here .... if not OK reset.
-    state = SR_STATE_MESSAGE;
+    state = RCV_STATE_MESSAGE;
 }
 
 void MsgReceiver::handleSepChar(int serialByte) {
     if (itemPos > 0) {
-        if (itemCnt == SR_MAX_ITEMS-1) {
+        if (itemCnt == RCV_MAX_ITEMS-1) {
             resetState();
-            error = SR_ERR_MESSAGE_LENGTH;
+            error = RCV_ERR_MESSAGE_LENGTH;
         }
         else {
             itemBuffer[itemCnt][itemPos] = '\0';
@@ -174,14 +174,14 @@ void MsgReceiver::handleSepChar(int serialByte) {
     }
     else {
         resetState();
-        error = SR_ERR_ITEM_LENGTH;
+        error = RCV_ERR_ITEM_LENGTH;
     }
 }
 
 void MsgReceiver::handleNewChar(int serialByte) {
-    if (itemPos == SR_MAX_ITEM_SZ) {
+    if (itemPos == RCV_MAX_ITEM_SZ) {
         resetState();
-        error = SR_ERR_ITEM_LENGTH;
+        error = RCV_ERR_ITEM_LENGTH;
     }
     else {
         if ((serialByte == '\n') || (serialByte == ' ')) {
@@ -194,18 +194,18 @@ void MsgReceiver::handleNewChar(int serialByte) {
 
 void MsgReceiver::reset() {
     resetState();
-    error = SR_ERR_NONE;
+    error = RCV_ERR_NONE;
 }
 
 void MsgReceiver::resetState() {
     resetItems();
-    state = SR_STATE_IDLE;
+    state = RCV_STATE_IDLE;
 }
 
 void MsgReceiver::resetItems() {
     itemCnt = 0;
     itemPos = 0;
-    for (int i=0; i<SR_MAX_ITEMS;i++) {
+    for (int i=0; i<RCV_MAX_ITEMS;i++) {
         itemBuffer[i][0] = '\0';
         itemLenBuffer[i] = 0;
     }

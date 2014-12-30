@@ -7,21 +7,21 @@
 #include "WProgram.h"
 #endif
 
-enum {SR_MAX_ITEM_SZ = 25};
-enum {SR_MAX_ITEMS = 5};
+enum {RCV_MAX_ITEM_SZ = 25};
+enum {RCV_MAX_ITEMS = 5};
 
-const char SR_DFLT_START_CHAR = '[';
-const char SR_DFLT_STOP_CHAR = ']';
-const char SR_DFLT_SEP_CHAR = ','; 
+const char RCV_DFLT_START_CHAR = '[';
+const char RCV_DFLT_STOP_CHAR = ']';
+const char RCV_DFLT_SEP_CHAR = ','; 
 
-const int SR_STATE_IDLE = 0;
-const int SR_STATE_RECEIVING = 1;
-const int SR_STATE_MESSAGE = 2;
+const int RCV_STATE_IDLE = 0;
+const int RCV_STATE_RECEIVING = 1;
+const int RCV_STATE_MESSAGE = 2;
 
-const int SR_ERR_NONE = 0;
-const int SR_ERR_ILLEGAL_CHAR = 1;
-const int SR_ERR_ITEM_LENGTH = 2;
-const int SR_ERR_MESSAGE_LENGTH = 3;
+const int RCV_ERR_NONE = 0;
+const int RCV_ERR_ILLEGAL_CHAR = 1;
+const int RCV_ERR_ITEM_LENGTH = 2;
+const int RCV_ERR_MESSAGE_LENGTH = 3;
 
 class MsgReceiver {
 
@@ -45,8 +45,8 @@ class MsgReceiver {
     private:
         uint8_t state;
         uint8_t error;
-        char itemBuffer[SR_MAX_ITEMS][SR_MAX_ITEM_SZ+1];
-        uint8_t itemLenBuffer[SR_MAX_ITEMS];
+        char itemBuffer[RCV_MAX_ITEMS][RCV_MAX_ITEM_SZ+1];
+        uint8_t itemLenBuffer[RCV_MAX_ITEMS];
         uint8_t itemCnt;
         uint8_t itemPos; 
         char startChar;
